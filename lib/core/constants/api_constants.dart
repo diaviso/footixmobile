@@ -12,7 +12,7 @@ class ApiConstants {
       }
       return 'http://10.0.2.2:3000';
     }
-    return 'https://footix-backend-production.up.railway.app';
+    return 'https://footixbackend.up.railway.app';
   }
 
   // Auth
