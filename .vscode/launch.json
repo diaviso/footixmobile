@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "DEC (Web - Edge)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": [
+        "--web-port",
+        "3003",
+        "-d",
+        "edge"
+      ]
+    },
+    {
+      "name": "DEC (Web - Chrome)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": [
+        "--web-port",
+        "3003",
+        "-d",
+        "chrome"
+      ]
+    },
+    {
+      "name": "DEC (Android)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart"
+    }
+  ]
+}
