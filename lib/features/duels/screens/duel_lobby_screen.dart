@@ -15,6 +15,10 @@ class DuelLobbyScreen extends ConsumerStatefulWidget {
 
 class _DuelLobbyScreenState extends ConsumerState<DuelLobbyScreen> {
   bool _copied = false;
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _searchResults = [];
+  bool _isSearching = false;
+  String? _invitingUserId;
 
   @override
   void initState() {
@@ -32,8 +36,36 @@ class _DuelLobbyScreenState extends ConsumerState<DuelLobbyScreen> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     // Don't stop polling here — the play screen may pick it up
     super.dispose();
+  }
+
+  Future<void> _onSearchChanged(String query) async {
+    if (query.trim().length < 2) {
+      setState(() { _searchResults = []; _isSearching = false; });
+      return;
+    }
+    setState(() => _isSearching = true);
+    final results = await ref.read(activeDuelProvider.notifier).searchUsers(query);
+    if (!mounted) return;
+    final duel = ref.read(activeDuelProvider).duel;
+    final participantIds = duel?.participants.map((p) => p.id).toSet() ?? {};
+    setState(() {
+      _searchResults = results.where((u) => !participantIds.contains(u['id'])).toList();
+      _isSearching = false;
+    });
+  }
+
+  Future<void> _inviteUser(String userId) async {
+    setState(() => _invitingUserId = userId);
+    final ok = await ref.read(activeDuelProvider.notifier).inviteUser(userId);
+    if (!mounted) return;
+    setState(() => _invitingUserId = null);
+    if (ok) {
+      _searchController.clear();
+      setState(() => _searchResults = []);
+    }
   }
 
   void _copyCode(String code) async {
@@ -140,6 +172,103 @@ class _DuelLobbyScreenState extends ConsumerState<DuelLobbyScreen> {
             ),
 
             const SizedBox(height: 24),
+
+            // Invite a player — only for creator when not full
+            if (duel.isCreator && !isFull) ...[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    Icon(Icons.person_add_rounded, size: 18, color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Inviter un joueur',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                decoration: InputDecoration(
+                  hintText: 'Rechercher par nom ou email...',
+                  hintStyle: TextStyle(fontSize: 13, color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                  prefixIcon: Icon(Icons.search_rounded, size: 20, color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                  suffixIcon: _isSearching
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary)),
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: isDark ? AppColors.cardDark : AppColors.cardLight,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: isDark ? AppColors.borderDark : AppColors.borderLight)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: isDark ? AppColors.borderDark : AppColors.borderLight)),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
+                ),
+              ),
+              if (_searchResults.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    color: isDark ? AppColors.cardDark : AppColors.cardLight,
+                    border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+                  ),
+                  child: Column(
+                    children: _searchResults.map((u) {
+                      final uid = u['id'] as String;
+                      final firstName = u['firstName'] as String? ?? '';
+                      final lastName = u['lastName'] as String? ?? '';
+                      final email = u['email'] as String? ?? '';
+                      final initials = '${firstName.isNotEmpty ? firstName[0] : ''}${lastName.isNotEmpty ? lastName[0] : ''}'.toUpperCase();
+                      return ListTile(
+                        dense: true,
+                        leading: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                          child: Text(initials, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.primary)),
+                        ),
+                        title: Text('$firstName $lastName', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight)),
+                        subtitle: Text(email, style: TextStyle(fontSize: 11, color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight)),
+                        trailing: SizedBox(
+                          width: 80,
+                          height: 30,
+                          child: ElevatedButton(
+                            onPressed: _invitingUserId == uid ? null : () => _inviteUser(uid),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              elevation: 0,
+                            ),
+                            child: _invitingUserId == uid
+                                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                : const Text('Inviter', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              if (_searchController.text.length >= 2 && !_isSearching && _searchResults.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    'Aucun joueur trouvé',
+                    style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                  ),
+                ),
+              const SizedBox(height: 24),
+            ],
 
             // Participants
             Align(

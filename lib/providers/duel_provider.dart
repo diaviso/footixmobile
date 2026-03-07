@@ -248,6 +248,30 @@ class ActiveDuelNotifier extends StateNotifier<ActiveDuelState> {
     }
   }
 
+  Future<List<Map<String, dynamic>>> searchUsers(String query) async {
+    try {
+      return await _service.searchUsers(query);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<bool> inviteUser(String userId) async {
+    if (state.duel == null) return false;
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final updated = await _service.invite(
+        duelId: state.duel!.id,
+        userId: userId,
+      );
+      state = state.copyWith(duel: updated, isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
   void reset() {
     stopPolling();
     state = const ActiveDuelState();

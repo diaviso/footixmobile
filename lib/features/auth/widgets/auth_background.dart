@@ -1,9 +1,7 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_design.dart';
 
-/// Animated gradient background with floating particles for auth screens
+/// Stadium-inspired auth background: curved red/gold header + white form area
 class AuthBackground extends StatelessWidget {
   final Widget child;
 
@@ -12,75 +10,31 @@ class AuthBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F5F0),
       body: Stack(
         children: [
-          // Full-screen gradient
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF1A1A1A),
-                    Color(0xFF2D2D2D),
-                    Color(0xFF3A3A3A),
-                    Color(0xFF2D2D2D),
-                    Color(0xFF1A1A1A),
-                  ],
-                  stops: [0.0, 0.25, 0.5, 0.75, 1.0],
-                ),
-              ),
-            ),
-          ),
-
-          // Radial glow overlay (top-right)
+          // Stadium-style curved red header
           Positioned(
-            top: -80,
-            right: -80,
-            child: Container(
-              width: 280,
-              height: 280,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.accent.withValues(alpha: 0.12),
-                    AppColors.accent.withValues(alpha: 0.04),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
+            top: 0,
+            left: 0,
+            right: 0,
+            child: CustomPaint(
+              painter: _StadiumHeaderPainter(),
+              size: Size(MediaQuery.of(context).size.width, 320),
             ),
           ),
 
-          // Radial glow overlay (bottom-left)
+          // Subtle pitch pattern on header
           Positioned(
-            bottom: -60,
-            left: -60,
-            child: Container(
-              width: 220,
-              height: 220,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.primaryLight.withValues(alpha: 0.15),
-                    AppColors.primaryLight.withValues(alpha: 0.05),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 280,
+            child: CustomPaint(
+              painter: _PitchPatternPainter(),
+              size: Size(MediaQuery.of(context).size.width, 280),
             ),
           ),
-
-          // Floating particles
-          Positioned.fill(
-            child: FloatingParticles(count: 12, color: AppColors.accent, maxSize: 6),
-          ),
-
-          // Geometric shapes
-          const Positioned.fill(child: _GeometricShapes()),
 
           // Content
           Positioned.fill(child: child),
@@ -90,25 +44,123 @@ class AuthBackground extends StatelessWidget {
   }
 }
 
-/// Glassmorphism card for auth forms
-class AuthCard extends StatelessWidget {
+/// Curved header painter — red gradient with gold accent line
+class _StadiumHeaderPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Main red gradient
+    final paint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color(0xFFAA1830),
+          Color(0xFFC41E3A),
+          Color(0xFFD42E4A),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    final path = Path()
+      ..lineTo(0, size.height - 80)
+      ..quadraticBezierTo(
+        size.width * 0.5,
+        size.height + 30,
+        size.width,
+        size.height - 80,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+
+    canvas.drawPath(path, paint);
+
+    // Gold accent line at the curve
+    final goldPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3
+      ..shader = const LinearGradient(
+        colors: [
+          Color(0x00D4AF37),
+          Color(0xFFD4AF37),
+          Color(0xFFE5C158),
+          Color(0xFFD4AF37),
+          Color(0x00D4AF37),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    final goldPath = Path()
+      ..moveTo(0, size.height - 78)
+      ..quadraticBezierTo(
+        size.width * 0.5,
+        size.height + 32,
+        size.width,
+        size.height - 78,
+      );
+
+    canvas.drawPath(goldPath, goldPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Subtle pitch lines on header
+class _PitchPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.06)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    // Center circle
+    canvas.drawCircle(
+      Offset(size.width * 0.5, size.height * 0.45),
+      60,
+      paint,
+    );
+
+    // Center dot
+    canvas.drawCircle(
+      Offset(size.width * 0.5, size.height * 0.45),
+      4,
+      Paint()..color = Colors.white.withValues(alpha: 0.08),
+    );
+
+    // Horizontal center line
+    canvas.drawLine(
+      Offset(size.width * 0.15, size.height * 0.45),
+      Offset(size.width * 0.85, size.height * 0.45),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Light-mode form card with subtle shadow
+class AuthFormCard extends StatelessWidget {
   final Widget child;
   final double borderRadius;
 
-  const AuthCard({super.key, required this.child, this.borderRadius = 24});
+  const AuthFormCard({super.key, required this.child, this.borderRadius = 24});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
-        color: Colors.white.withValues(alpha: 0.1),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 32,
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 24,
             offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.04),
+            blurRadius: 40,
+            offset: const Offset(0, 16),
           ),
         ],
       ),
@@ -176,95 +228,109 @@ class _AuthStaggeredItemState extends State<AuthStaggeredItem>
   }
 }
 
-/// Decorative geometric shapes
-class _GeometricShapes extends StatefulWidget {
-  const _GeometricShapes();
-
-  @override
-  State<_GeometricShapes> createState() => _GeometricShapesState();
+/// Shared input decoration for auth fields — light mode
+InputDecoration authInputDecoration({
+  required String hint,
+  required IconData icon,
+  Widget? suffixIcon,
+}) {
+  return InputDecoration(
+    hintText: hint,
+    hintStyle: TextStyle(color: AppColors.textMutedLight.withValues(alpha: 0.6), fontSize: 14),
+    prefixIcon: Icon(icon, size: 20, color: AppColors.textSecondaryLight),
+    suffixIcon: suffixIcon,
+    filled: true,
+    fillColor: const Color(0xFFF5F3EF),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: AppColors.error),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+    ),
+    errorStyle: const TextStyle(color: AppColors.error, fontSize: 12),
+  );
 }
 
-class _GeometricShapesState extends State<_GeometricShapes>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
+/// Primary red gradient button for auth
+class AuthPrimaryButton extends StatelessWidget {
+  final String text;
+  final IconData icon;
+  final bool isLoading;
+  final VoidCallback onPressed;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 20),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const AuthPrimaryButton({
+    super.key,
+    required this.text,
+    required this.icon,
+    required this.isLoading,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        return CustomPaint(
-          painter: _ShapesPainter(progress: _controller.value),
-          size: Size.infinite,
-        );
-      },
+    return SizedBox(
+      width: double.infinity,
+      height: 54,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: isLoading
+              ? null
+              : const LinearGradient(
+                  colors: [Color(0xFFC41E3A), Color(0xFFE74C5E)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+          color: isLoading ? AppColors.neutral300 : null,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: isLoading
+              ? null
+              : [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+        ),
+        child: ElevatedButton.icon(
+          onPressed: isLoading ? null : onPressed,
+          icon: isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Icon(icon, size: 20),
+          label: Text(
+            text,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        ),
+      ),
     );
   }
-}
-
-class _ShapesPainter extends CustomPainter {
-  final double progress;
-  _ShapesPainter({required this.progress});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final t = progress * math.pi * 2;
-
-    // Rotating ring top-left
-    _drawRing(canvas, Offset(size.width * 0.15, size.height * 0.12), 30, t, 0.06);
-    // Rotating ring bottom-right
-    _drawRing(canvas, Offset(size.width * 0.85, size.height * 0.88), 25, -t * 0.7, 0.05);
-    // Small diamond center-right
-    _drawDiamond(canvas, Offset(size.width * 0.9, size.height * 0.35), 12, t * 0.5, 0.07);
-    // Small diamond left
-    _drawDiamond(canvas, Offset(size.width * 0.08, size.height * 0.65), 10, -t * 0.8, 0.05);
-  }
-
-  void _drawRing(Canvas canvas, Offset center, double radius, double angle, double opacity) {
-    final paint = Paint()
-      ..color = AppColors.accent.withValues(alpha: opacity)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    canvas.save();
-    canvas.translate(center.dx, center.dy);
-    canvas.rotate(angle);
-    canvas.drawOval(Rect.fromCenter(center: Offset.zero, width: radius * 2, height: radius * 1.2), paint);
-    canvas.restore();
-  }
-
-  void _drawDiamond(Canvas canvas, Offset center, double size, double angle, double opacity) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: opacity)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    canvas.save();
-    canvas.translate(center.dx, center.dy);
-    canvas.rotate(angle);
-    final path = Path()
-      ..moveTo(0, -size)
-      ..lineTo(size, 0)
-      ..lineTo(0, size)
-      ..lineTo(-size, 0)
-      ..close();
-    canvas.drawPath(path, paint);
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _ShapesPainter old) => old.progress != progress;
 }

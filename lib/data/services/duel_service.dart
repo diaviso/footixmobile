@@ -97,4 +97,28 @@ class DuelService {
       throw ApiException.fromDioError(e);
     }
   }
+
+  Future<List<Map<String, dynamic>>> searchUsers(String query) async {
+    try {
+      final response = await _client.get('/duels/search-users?q=${Uri.encodeComponent(query)}');
+      final list = response.data as List;
+      return list.map((e) => e as Map<String, dynamic>).toList();
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    }
+  }
+
+  Future<DuelModel> invite({
+    required String duelId,
+    required String userId,
+  }) async {
+    try {
+      final response = await _client.post('/duels/$duelId/invite', data: {
+        'userId': userId,
+      });
+      return DuelModel.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    }
+  }
 }

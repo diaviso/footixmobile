@@ -6,6 +6,7 @@ import '../core/theme/app_colors.dart';
 import '../core/theme/app_design.dart';
 import '../core/utils/avatar_utils.dart';
 import '../providers/auth_provider.dart';
+import '../providers/notification_provider.dart';
 import 'app_router.dart';
 
 class MainScaffold extends ConsumerWidget {
@@ -414,6 +415,30 @@ class _AppDrawer extends ConsumerWidget {
                   label: 'Classement',
                   isActive: currentLocation.startsWith(AppRoutes.leaderboard),
                   onTap: () => _navigate(context, AppRoutes.leaderboard),
+                ),
+
+                _DrawerItem(
+                  icon: Icons.notifications_rounded,
+                  label: 'Notifications',
+                  isActive: false,
+                  onTap: () => _navigatePush(context, AppRoutes.notifications),
+                  trailing: Consumer(
+                    builder: (context, ref, _) {
+                      final count = ref.watch(notificationProvider).unreadCount;
+                      if (count == 0) return const SizedBox.shrink();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          count > 9 ? '9+' : '$count',
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                        ),
+                      );
+                    },
+                  ),
                 ),
 
                 const Divider(height: 16, indent: 16, endIndent: 16),

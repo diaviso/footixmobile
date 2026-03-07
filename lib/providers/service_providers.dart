@@ -31,3 +31,7 @@ final dashboardServiceProvider = Provider<DashboardService>((ref) {
 final duelServiceProvider = Provider<DuelService>((ref) {
   return DuelService(ref.watch(apiClientProvider));
 });
+
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  return NotificationService(ref.watch(apiClientProvider));
+});

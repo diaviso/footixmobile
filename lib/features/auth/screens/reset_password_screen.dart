@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_design.dart';
 import '../../../data/api/api_exception.dart';
 import '../../../navigation/app_router.dart';
 import '../../../providers/service_providers.dart';
@@ -103,394 +102,354 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Invalid token state
-    if (widget.token.isEmpty) {
-      return _buildInvalidTokenState();
-    }
-
-    // Success state
-    if (_isSuccess) {
-      return _buildSuccessState();
-    }
-
-    // Form state
+    if (widget.token.isEmpty) return _buildInvalidTokenState();
+    if (_isSuccess) return _buildSuccessState();
     return _buildFormState();
   }
 
-  // ── Invalid token state ──
   Widget _buildInvalidTokenState() {
     return AuthBackground(
       child: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: AuthStaggeredItem(
-              index: 0,
-              child: AuthCard(
-                child: Padding(
-                  padding: const EdgeInsets.all(28),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Error icon
-                      Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          color: AppColors.error.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.cancel_rounded, size: 36, color: AppColors.error),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Title
-                      const Text(
-                        'Lien invalide',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-
-                      // Description
-                      Text(
-                        'Le lien de réinitialisation est invalide ou a expiré.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.6), height: 1.5),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Request new link button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: AppDesign.primaryGradient,
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: AppDesign.glowShadow(AppColors.primary, blur: 12),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 44),
+              AuthStaggeredItem(
+                index: 0,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
-                          child: ElevatedButton.icon(
+                        ],
+                      ),
+                      child: const Icon(Icons.link_off_rounded, size: 30, color: AppColors.error),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Lien invalide',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: AuthStaggeredItem(
+                  index: 1,
+                  child: AuthFormCard(
+                    child: Padding(
+                      padding: const EdgeInsets.all(28),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.cancel_rounded, size: 32, color: AppColors.error),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Le lien de réinitialisation est invalide ou a expiré.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 14, color: AppColors.textSecondaryLight, height: 1.5),
+                          ),
+                          const SizedBox(height: 24),
+                          AuthPrimaryButton(
+                            text: 'Demander un nouveau lien',
+                            icon: Icons.mail_rounded,
+                            isLoading: false,
                             onPressed: () => context.go(AppRoutes.forgotPassword),
-                            icon: const Icon(Icons.mail_rounded, size: 20),
-                            label: const Text(
-                              'Demander un nouveau lien',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // ── Success state ──
   Widget _buildSuccessState() {
     return AuthBackground(
       child: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: AuthStaggeredItem(
-              index: 0,
-              child: AuthCard(
-                child: Padding(
-                  padding: const EdgeInsets.all(28),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Success icon
-                      Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          gradient: AppDesign.primaryGradient,
-                          shape: BoxShape.circle,
-                          boxShadow: AppDesign.glowShadow(AppColors.primary, blur: 16),
-                        ),
-                        child: const Icon(Icons.check_circle_rounded, size: 36, color: Colors.white),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Title
-                      const Text(
-                        'Mot de passe réinitialisé !',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-
-                      // Description
-                      Text(
-                        'Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous connecter.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.6), height: 1.5),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Login button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: AppDesign.primaryGradient,
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: AppDesign.glowShadow(AppColors.primary, blur: 12),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 44),
+              AuthStaggeredItem(
+                index: 0,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
-                          child: ElevatedButton.icon(
+                        ],
+                      ),
+                      child: const Icon(Icons.check_circle_rounded, size: 30, color: AppColors.success),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Mot de passe modifié !',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: AuthStaggeredItem(
+                  index: 1,
+                  child: AuthFormCard(
+                    child: Padding(
+                      padding: const EdgeInsets.all(28),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: AppColors.success.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.verified_rounded, size: 32, color: AppColors.success),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Votre mot de passe a été modifié avec succès.\nVous pouvez maintenant vous connecter.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 14, color: AppColors.textSecondaryLight, height: 1.5),
+                          ),
+                          const SizedBox(height: 24),
+                          AuthPrimaryButton(
+                            text: 'Se connecter',
+                            icon: Icons.login_rounded,
+                            isLoading: false,
                             onPressed: () => context.go(AppRoutes.login),
-                            icon: const Icon(Icons.login_rounded, size: 20),
-                            label: const Text(
-                              'Se connecter',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // ── Form state ──
   Widget _buildFormState() {
     return AuthBackground(
       child: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: AuthStaggeredItem(
-              index: 0,
-              child: AuthCard(
-                child: Padding(
-                  padding: const EdgeInsets.all(28),
-                  child: Column(
-                    children: [
-                      // Lock icon
-                      Container(
-                        width: 68,
-                        height: 68,
-                        decoration: BoxDecoration(
-                          gradient: AppDesign.primaryGradient,
-                          shape: BoxShape.circle,
-                          boxShadow: AppDesign.glowShadow(AppColors.primary, blur: 16),
-                        ),
-                        child: const Icon(Icons.lock_rounded, size: 32, color: Colors.white),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // ── Header ──
+              const SizedBox(height: 44),
+              AuthStaggeredItem(
+                index: 0,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-
-                      // Title
-                      const Text(
-                        'Nouveau mot de passe',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      child: const Icon(Icons.lock_reset_rounded, size: 30, color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Nouveau mot de passe',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
                       ),
-                      const SizedBox(height: 8),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
 
-                      // Description
-                      Text(
-                        'Choisissez un nouveau mot de passe sécurisé pour votre compte.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.6), height: 1.5),
-                      ),
-                      const SizedBox(height: 24),
+              // ── Form card ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: AuthStaggeredItem(
+                  index: 1,
+                  child: AuthFormCard(
+                    child: Padding(
+                      padding: const EdgeInsets.all(28),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Choisissez un nouveau mot de passe sécurisé pour votre compte.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 14, color: AppColors.textSecondaryLight, height: 1.5),
+                          ),
+                          const SizedBox(height: 24),
 
-                      // Form
-                      Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // New password field
-                            _buildPasswordField(
-                              label: 'Nouveau mot de passe',
-                              hint: 'Minimum 6 caractères',
-                              controller: _passwordController,
-                              showPassword: _showPassword,
-                              toggleVisibility: () => setState(() => _showPassword = !_showPassword),
-                              textInputAction: TextInputAction.next,
-                              validator: (v) {
-                                if (v == null || v.isEmpty) return 'Veuillez entrer un mot de passe';
-                                if (v.length < 6) return 'Minimum 6 caractères';
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 14),
-
-                            // Confirm password field
-                            _buildPasswordField(
-                              label: 'Confirmer le mot de passe',
-                              hint: 'Retapez votre mot de passe',
-                              controller: _confirmController,
-                              showPassword: _showConfirm,
-                              toggleVisibility: () => setState(() => _showConfirm = !_showConfirm),
-                              textInputAction: TextInputAction.done,
-                              onSubmitted: (_) => _handleSubmit(),
-                              validator: (v) {
-                                if (v == null || v.isEmpty) return 'Veuillez confirmer le mot de passe';
-                                if (v != _passwordController.text) return 'Les mots de passe ne correspondent pas';
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-
-                            // Submit button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 52,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  gradient: _isLoading ? null : AppDesign.primaryGradient,
-                                  color: _isLoading ? Colors.white.withValues(alpha: 0.1) : null,
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: _isLoading ? null : AppDesign.glowShadow(AppColors.primary, blur: 12),
-                                ),
-                                child: ElevatedButton.icon(
-                                  onPressed: _isLoading ? null : _handleSubmit,
-                                  icon: _isLoading
-                                      ? const SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                        )
-                                      : const Icon(Icons.lock_reset_rounded, size: 20),
-                                  label: Text(
-                                    _isLoading ? 'Réinitialisation...' : 'Réinitialiser le mot de passe',
-                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // New password
+                                const Text(
+                                  'Nouveau mot de passe',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textSecondaryLight,
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                                const SizedBox(height: 6),
+                                TextFormField(
+                                  controller: _passwordController,
+                                  obscureText: !_showPassword,
+                                  textInputAction: TextInputAction.next,
+                                  style: const TextStyle(color: AppColors.textPrimaryLight, fontSize: 15),
+                                  decoration: authInputDecoration(
+                                    hint: 'Minimum 6 caractères',
+                                    icon: Icons.lock_outline_rounded,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                        size: 20,
+                                        color: AppColors.textMutedLight,
+                                      ),
+                                      onPressed: () => setState(() => _showPassword = !_showPassword),
+                                    ),
+                                  ),
+                                  validator: (v) {
+                                    if (v == null || v.isEmpty) return 'Veuillez entrer un mot de passe';
+                                    if (v.length < 6) return 'Minimum 6 caractères';
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 14),
 
-                      // Back to login
-                      TextButton.icon(
-                        onPressed: () => context.go(AppRoutes.login),
-                        icon: const Icon(Icons.arrow_back_rounded, size: 16),
-                        label: const Text('Retour à la connexion'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white.withValues(alpha: 0.5),
-                        ),
+                                // Confirm password
+                                const Text(
+                                  'Confirmer le mot de passe',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                TextFormField(
+                                  controller: _confirmController,
+                                  obscureText: !_showConfirm,
+                                  textInputAction: TextInputAction.done,
+                                  onFieldSubmitted: (_) => _handleSubmit(),
+                                  style: const TextStyle(color: AppColors.textPrimaryLight, fontSize: 15),
+                                  decoration: authInputDecoration(
+                                    hint: 'Retapez votre mot de passe',
+                                    icon: Icons.lock_outline_rounded,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _showConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                        size: 20,
+                                        color: AppColors.textMutedLight,
+                                      ),
+                                      onPressed: () => setState(() => _showConfirm = !_showConfirm),
+                                    ),
+                                  ),
+                                  validator: (v) {
+                                    if (v == null || v.isEmpty) return 'Veuillez confirmer le mot de passe';
+                                    if (v != _passwordController.text) return 'Les mots de passe ne correspondent pas';
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 22),
+
+                                // Submit
+                                AuthPrimaryButton(
+                                  text: _isLoading ? 'Réinitialisation...' : 'Réinitialiser le mot de passe',
+                                  icon: Icons.lock_reset_rounded,
+                                  isLoading: _isLoading,
+                                  onPressed: _handleSubmit,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+              const SizedBox(height: 24),
+
+              // Back to login
+              AuthStaggeredItem(
+                index: 2,
+                child: TextButton.icon(
+                  onPressed: () => context.go(AppRoutes.login),
+                  icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                  label: const Text(
+                    'Retour à la connexion',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+            ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildPasswordField({
-    required String label,
-    required String hint,
-    required TextEditingController controller,
-    required bool showPassword,
-    required VoidCallback toggleVisibility,
-    TextInputAction? textInputAction,
-    void Function(String)? onSubmitted,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.7)),
-        ),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: controller,
-          obscureText: !showPassword,
-          textInputAction: textInputAction ?? TextInputAction.next,
-          onFieldSubmitted: onSubmitted,
-          validator: validator,
-          style: const TextStyle(color: Colors.white, fontSize: 15),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
-            prefixIcon: Icon(Icons.lock_outline_rounded, size: 20, color: Colors.white.withValues(alpha: 0.5)),
-            suffixIcon: IconButton(
-              icon: Icon(
-                showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                size: 20,
-                color: Colors.white.withValues(alpha: 0.5),
-              ),
-              onPressed: toggleVisibility,
-            ),
-            filled: true,
-            fillColor: Colors.white.withValues(alpha: 0.08),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.error),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
-            ),
-            errorStyle: const TextStyle(color: Color(0xFFFF8A80)),
-          ),
-        ),
-      ],
     );
   }
 }

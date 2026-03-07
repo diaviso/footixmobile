@@ -31,6 +31,7 @@ import '../features/duels/screens/duel_join_screen.dart';
 import '../features/duels/screens/duel_lobby_screen.dart';
 import '../features/duels/screens/duel_play_screen.dart';
 import '../features/duels/screens/duel_results_screen.dart';
+import '../features/notifications/screens/notifications_screen.dart';
 
 /// Route names
 class AppRoutes {
@@ -57,6 +58,9 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String terms = '/terms';
   static const String help = '/help';
+
+  // Notifications
+  static const String notifications = '/notifications';
 
   // Duels
   static const String duels = '/duels';
@@ -257,6 +261,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.help,
         pageBuilder: (context, state) => _buildTransitionPage(state, const HelpScreen()),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.notifications,
+        pageBuilder: (context, state) => _buildTransitionPage(state, const NotificationsScreen()),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

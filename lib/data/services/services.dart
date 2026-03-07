@@ -4,3 +4,4 @@ export 'quizzes_service.dart';
 export 'leaderboard_service.dart';
 export 'dashboard_service.dart';
 export 'duel_service.dart';
+export 'notification_service.dart';
