@@ -178,59 +178,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           const SizedBox(height: 18),
 
-                          // Google button first
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: OutlinedButton(
-                              onPressed: _isLoading ? null : _handleGoogleLogin,
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Color(0xFFE0DCD5), width: 1.5),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                backgroundColor: Colors.white,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CustomPaint(painter: _GoogleLogoPainter()),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  const Text(
-                                    'Continuer avec Google',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
-                                      color: AppColors.textPrimaryLight,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-
-                          // OR divider
-                          Row(
-                            children: [
-                              Expanded(child: Divider(color: AppColors.borderLight.withValues(alpha: 0.5))),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 14),
-                                child: Text(
-                                  'OU',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textMutedLight,
-                                  ),
-                                ),
-                              ),
-                              Expanded(child: Divider(color: AppColors.borderLight.withValues(alpha: 0.5))),
-                            ],
-                          ),
-                          const SizedBox(height: 18),
+                          // Google sign-in hidden for now
+                          // SizedBox(
+                          //   width: double.infinity,
+                          //   height: 50,
+                          //   child: OutlinedButton(
+                          //     onPressed: _isLoading ? null : _handleGoogleLogin,
+                          //     ...
+                          //   ),
+                          // ),
+                          // const SizedBox(height: 18),
+                          // Row( ... OU divider ... ),
+                          // const SizedBox(height: 18),
 
                           // Form
                           Form(

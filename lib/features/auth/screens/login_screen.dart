@@ -317,29 +317,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 20),
 
                           // OR divider
-                          Row(
-                            children: [
-                              Expanded(child: Divider(color: AppColors.borderLight.withValues(alpha: 0.5))),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 14),
-                                child: Text(
-                                  'OU',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textMutedLight,
-                                  ),
-                                ),
-                              ),
-                              Expanded(child: Divider(color: AppColors.borderLight.withValues(alpha: 0.5))),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Google button
-                          _GoogleSignInButton(
-                            onPressed: _isLoading ? null : _handleGoogleLogin,
-                          ),
+                          // Google sign-in hidden for now
+                          // Row(
+                          //   children: [
+                          //     Expanded(child: Divider(color: AppColors.borderLight.withValues(alpha: 0.5))),
+                          //     Padding(
+                          //       padding: const EdgeInsets.symmetric(horizontal: 14),
+                          //       child: Text('OU', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMutedLight)),
+                          //     ),
+                          //     Expanded(child: Divider(color: AppColors.borderLight.withValues(alpha: 0.5))),
+                          //   ],
+                          // ),
+                          // const SizedBox(height: 20),
+                          // _GoogleSignInButton(
+                          //   onPressed: _isLoading ? null : _handleGoogleLogin,
+                          // ),
                         ],
                       ),
                     ),

@@ -350,6 +350,18 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
     final questionCount = quiz.count?.questions ?? 0;
     final bestScore = status?.bestScore;
 
+    // Determine attempt status for visual distinction
+    AttemptStatus attemptStatus;
+    if (hasPassed) {
+      attemptStatus = AttemptStatus.won;
+    } else if (status != null && status.isCompleted && !hasPassed) {
+      attemptStatus = AttemptStatus.failed;
+    } else if (status != null && status.totalAttempts > 0) {
+      attemptStatus = AttemptStatus.attempted;
+    } else {
+      attemptStatus = AttemptStatus.none;
+    }
+
     // Determine ribbon text
     String? ribbon;
     if (quiz.isFree) {
@@ -390,6 +402,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
       isPremium: !quiz.isFree,
       isLocked: isLocked,
       isPassed: hasPassed,
+      attemptStatus: attemptStatus,
       ribbon: ribbon,
       trailing: trailing,
       onTap: () => context.push('/quizzes/${quiz.id}/play'),

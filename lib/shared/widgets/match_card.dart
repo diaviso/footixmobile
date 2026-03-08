@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_design.dart';
 
+enum AttemptStatus { won, attempted, failed, none }
+
 /// Match ticket-style card for quiz/duel listings.
 class MatchCard extends StatelessWidget {
   final String title;
@@ -15,6 +17,7 @@ class MatchCard extends StatelessWidget {
   final bool isPremium;
   final bool isLocked;
   final bool isPassed;
+  final AttemptStatus attemptStatus;
   final bool isFeatured;
   final String? ribbon;
   final VoidCallback? onTap;
@@ -33,6 +36,7 @@ class MatchCard extends StatelessWidget {
     this.isPremium = false,
     this.isLocked = false,
     this.isPassed = false,
+    this.attemptStatus = AttemptStatus.none,
     this.isFeatured = false,
     this.ribbon,
     this.onTap,
@@ -50,9 +54,39 @@ class MatchCard extends StatelessWidget {
     }
   }
 
+  Color? get _statusBorderColor {
+    switch (attemptStatus) {
+      case AttemptStatus.won:
+        return Colors.green.shade300;
+      case AttemptStatus.failed:
+        return Colors.red.shade300;
+      case AttemptStatus.attempted:
+        return Colors.amber.shade300;
+      case AttemptStatus.none:
+        return null;
+    }
+  }
+
+  Color? get _statusBgColor {
+    switch (attemptStatus) {
+      case AttemptStatus.won:
+        return Colors.green.withValues(alpha: 0.04);
+      case AttemptStatus.failed:
+        return Colors.red.withValues(alpha: 0.04);
+      case AttemptStatus.attempted:
+        return Colors.amber.withValues(alpha: 0.03);
+      case AttemptStatus.none:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = _statusBorderColor ??
+        (isDark ? const Color(0xFF1B2B40) : const Color(0xFFDCE6F0));
+    final bgColor = _statusBgColor ??
+        (isDark ? const Color(0xFF0D1525) : Colors.white);
 
     return GestureDetector(
       onTap: isLocked ? null : onTap,
@@ -60,14 +94,8 @@ class MatchCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: isDark ? const Color(0xFF0D1525) : Colors.white,
-          border: Border.all(
-            color: isPassed
-                ? AppColors.success.withValues(alpha: 0.3)
-                : isDark
-                    ? const Color(0xFF1B2B40)
-                    : const Color(0xFFDCE6F0),
-          ),
+          color: bgColor,
+          border: Border.all(color: borderColor),
           boxShadow: AppDesign.softShadow(),
         ),
         child: Stack(
@@ -116,6 +144,56 @@ class MatchCard extends StatelessWidget {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 6),
+                      // Attempt status badge
+                      if (attemptStatus == AttemptStatus.won)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check_circle_rounded, size: 11, color: Colors.green.shade700),
+                              const SizedBox(width: 3),
+                              Text('Réussi', style: TextStyle(color: Colors.green.shade700, fontSize: 10, fontWeight: FontWeight.w800)),
+                            ],
+                          ),
+                        ),
+                      if (attemptStatus == AttemptStatus.attempted)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.refresh_rounded, size: 11, color: Colors.amber.shade800),
+                              const SizedBox(width: 3),
+                              Text('En cours', style: TextStyle(color: Colors.amber.shade800, fontSize: 10, fontWeight: FontWeight.w800)),
+                            ],
+                          ),
+                        ),
+                      if (attemptStatus == AttemptStatus.failed)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.cancel_rounded, size: 11, color: Colors.red.shade700),
+                              const SizedBox(width: 3),
+                              Text('Échoué', style: TextStyle(color: Colors.red.shade700, fontSize: 10, fontWeight: FontWeight.w800)),
+                            ],
+                          ),
+                        ),
                       const Spacer(),
                       // Stars
                       if (stars != null)
